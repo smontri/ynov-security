@@ -1,6 +1,6 @@
 variable "prefix" {
   # A personnaliser avec votre nom
-  default = "ynov"
+  default = "ynov-security"
 }
 
 variable "environment" {
@@ -8,7 +8,7 @@ variable "environment" {
 }
 
 variable "project" {
-  default = "ynov"
+  default = "ynov-security"
 }
 
 variable "ssh_key" {

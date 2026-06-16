@@ -1,9 +1,9 @@
 # Virtual Network
-resource "azurerm_virtual_network" "ci-cd-vnet" {
+resource "azurerm_virtual_network" "ynov-vnet" {
   name                = "${var.prefix}-network"
   address_space       = ["10.0.0.0/16"]
-  location            = azurerm_resource_group.ci-cd-rg.location
-  resource_group_name = azurerm_resource_group.ci-cd-rg.name
+  location            = azurerm_resource_group.ynov-rg.location
+  resource_group_name = azurerm_resource_group.ynov-rg.name
 
   tags = {
     environment = "${var.environment}"
@@ -14,12 +14,12 @@ resource "azurerm_virtual_network" "ci-cd-vnet" {
 }
 
 # Virtual Machine
-resource "azurerm_linux_virtual_machine" "ci-cd-vm" {
+resource "azurerm_linux_virtual_machine" "ynov-vm" {
   name                  = "${var.prefix}-vm"
-  location              = azurerm_resource_group.ci-cd-rg.location
-  resource_group_name   = azurerm_resource_group.ci-cd-rg.name
+  location              = azurerm_resource_group.ynov-rg.location
+  resource_group_name   = azurerm_resource_group.ynov-rg.name
   network_interface_ids = [
-    azurerm_network_interface.ci-cd-nic.id
+    azurerm_network_interface.ynov-nic.id
   ]
   size                  = "Standard_D2s_v3"
   admin_username        = "adminuser"
@@ -50,19 +50,19 @@ resource "azurerm_linux_virtual_machine" "ci-cd-vm" {
 }
 
 output "vm_name" {
-  value = azurerm_linux_virtual_machine.ci-cd-vm.name
+  value = azurerm_linux_virtual_machine.ynov-vm.name
 }
 
 # Subnet
-resource "azurerm_subnet" "ci-cd-subnet" {
+resource "azurerm_subnet" "ynov-subnet" {
   name                 = "${var.prefix}-subnet"
-  resource_group_name  = azurerm_resource_group.ci-cd-rg.name
-  virtual_network_name = azurerm_virtual_network.ci-cd-vnet.name
+  resource_group_name  = azurerm_resource_group.ynov-rg.name
+  virtual_network_name = azurerm_virtual_network.ynov-vnet.name
   address_prefixes     = ["10.0.2.0/24"]
 }
 
 # Resource Group
-resource "azurerm_resource_group" "ci-cd-rg" {
+resource "azurerm_resource_group" "ynov-rg" {
   name     = "${var.prefix}-resources"
   location = "North Europe"
 
@@ -75,10 +75,10 @@ resource "azurerm_resource_group" "ci-cd-rg" {
 }
 
 # Public IPs
-resource "azurerm_public_ip" "ci-cd-ip" {
+resource "azurerm_public_ip" "ynov-ip" {
   name                = "${var.prefix}-ip"
-  location            = azurerm_resource_group.ci-cd-rg.location
-  resource_group_name = azurerm_resource_group.ci-cd-rg.name
+  location            = azurerm_resource_group.ynov-rg.location
+  resource_group_name = azurerm_resource_group.ynov-rg.name
   allocation_method   = "Static"
 
   tags = {
@@ -90,14 +90,14 @@ resource "azurerm_public_ip" "ci-cd-ip" {
 }
 
 output "public_ip" {
-  value = azurerm_public_ip.ci-cd-ip.ip_address
+  value = azurerm_public_ip.ynov-ip.ip_address
 }
 
 # Network Security Group and rule
-resource "azurerm_network_security_group" "ci-cd-nsg" {
+resource "azurerm_network_security_group" "ynov-nsg" {
   name                = "${var.prefix}-nsg"
-  location            = azurerm_resource_group.ci-cd-rg.location
-  resource_group_name = azurerm_resource_group.ci-cd-rg.name
+  location            = azurerm_resource_group.ynov-rg.location
+  resource_group_name = azurerm_resource_group.ynov-rg.name
 
   # Allow incoming connection on port 22 for SSH
   security_rule {
@@ -120,16 +120,16 @@ resource "azurerm_network_security_group" "ci-cd-nsg" {
 }
 
 # Network Interface
-resource "azurerm_network_interface" "ci-cd-nic" {
+resource "azurerm_network_interface" "ynov-nic" {
   name                = "${var.prefix}-nic"
-  location            = azurerm_resource_group.ci-cd-rg.location
-  resource_group_name = azurerm_resource_group.ci-cd-rg.name
+  location            = azurerm_resource_group.ynov-rg.location
+  resource_group_name = azurerm_resource_group.ynov-rg.name
 
   ip_configuration {
     name                          = "testconfiguration1"
-    subnet_id                     = azurerm_subnet.ci-cd-subnet.id
+    subnet_id                     = azurerm_subnet.ynov-subnet.id
     private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.ci-cd-ip.id
+    public_ip_address_id          = azurerm_public_ip.ynov-ip.id
   }
 
   tags = {
